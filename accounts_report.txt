@@ -1,0 +1,3 @@
+Account Number: 111, Account Holder: emily, Balance: $100.0
+Account Number: 123, Account Holder: james, Balance: $804.0
+Account Number: 666, Account Holder: david, Balance: $396.0
