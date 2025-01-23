@@ -1,17 +1,22 @@
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
+
+    private static final Scanner scanner = new Scanner(System.in);
+    private static final Map<String, BankAccount> accounts = new HashMap<>();
+
     public static void main(String[] args) {
 
-        Scanner scanner = new Scanner(System.in);
         boolean isRunning = true;
         int choice;
-        BankAccount account1 = new BankAccount(500.0); // Initial balance
-        BankAccount account2 = new BankAccount();
-
-
 
         while (isRunning){
 
@@ -23,72 +28,121 @@ public class Main {
             System.out.println("2. Withdraw");
             System.out.println("3. Print Balance");
             System.out.println("4. Transfer Money");
-            System.out.println("5. Exit");
+            System.out.println("5. Create Account");
+            System.out.println("6. Save Report to File");
+            System.out.println("7. Exit");
             System.out.println("**************");
 
-            System.out.print("Enter your choice (1-5)");
+            System.out.print("Enter your choice (1-7)");
             choice = scanner.nextInt();
+            scanner.nextLine();
 
             switch (choice) {
-                case 1 -> {
-                    System.out.print("Enter account number (1 or 2): ");
-                    int accountChoice = scanner.nextInt();
-                    System.out.print("Enter deposit amount: ");
-                    double depositAmount = scanner.nextDouble();
-                    if (accountChoice == 1) {
-                        account1.deposit(depositAmount);
-                    } else if (accountChoice == 2) {
-                        account2.deposit(depositAmount);
-                    } else {
-                        System.out.println("Invalid account number!");
-                    }
-                }
-                case 2 -> {
-                    System.out.print("Enter account number (1 or 2): ");
-                    int accountChoice = scanner.nextInt();
-                    System.out.print("Enter withdrawal amount: ");
-                    double withdrawAmount = scanner.nextDouble();
-                    if (accountChoice == 1) {
-                        account1.withdraw(withdrawAmount);
-                    } else if (accountChoice == 2) {
-                        account2.withdraw(withdrawAmount);
-                    } else {
-                        System.out.println("Invalid account number!");
-                    }
-                }
-                case 3 -> {
-                    System.out.print("Enter account number (1 or 2): ");
-                    int accountChoice = scanner.nextInt();
-                    if (accountChoice == 1) {
-                        account1.printBalance();
-                    } else if (accountChoice == 2) {
-                        account2.printBalance();
-                    } else {
-                        System.out.println("Invalid account number!");
-                    }
-                }
-                case 4 -> {
-                    System.out.print("Enter transfer amount: ");
-                    double transferAmount = scanner.nextDouble();
-                    System.out.print("Transfer from account (1 or 2): ");
-                    int fromAccount = scanner.nextInt();
-                    if (fromAccount == 1) {
-                        account1.transfer(account2, transferAmount);
-                    } else if (fromAccount == 2) {
-                        account2.transfer(account1, transferAmount);
-                    } else {
-                        System.out.println("Invalid account number!");
-                    }
-                }
-                case 5 -> {
+                case 1 -> deposit();
+                case 2 -> withdraw();
+                case 3 -> printAccounts();
+                case 4 -> transfer();
+                case 5 -> createAccount();
+                case 6 -> saveReportToFile();
+                case 7 -> {
                     System.out.println("Exiting Banking System!");
                     isRunning = false;
                 }
                 default -> System.out.println("Invalid option! Please try again.");
             }
         }
-
         scanner.close();
 
     }
+    //****************************DEPOSIT*******************************************
+    private static void deposit() {
+        System.out.print("Enter account number: ");
+        String accountNumber = scanner.nextLine();
+
+        BankAccount account = accounts.get(accountNumber);
+        if (account != null) {
+            System.out.print("Enter amount to deposit: ");
+            double amount = scanner.nextDouble();
+            account.deposit(amount);
+        } else {
+            System.out.println("Invalid account number!");
+        }
+    }
+    //****************************CREATE ACCOUNT*******************************************
+    private static void createAccount() {
+        System.out.println("Enter account number: ");
+        String accountNumber = scanner.nextLine(); // Read account number
+
+        System.out.println("Enter account holder name: ");
+        String accountHolderName = scanner.nextLine(); // Read account holder name
+
+        System.out.println("Enter initial balance: ");
+        double balance = scanner.nextDouble();
+        scanner.nextLine();
+
+        BankAccount account = new BankAccount(accountNumber, accountHolderName, balance);
+        accounts.put(accountNumber, account); // Add account to the map
+
+        System.out.println("Account created successfully!");
+    }
+    //****************************CHECK THE ACCOUNT*******************************************
+    private static void printAccounts() {
+        if (accounts.isEmpty()) {
+            System.out.println("No accounts available.");
+        } else {
+            accounts.values().forEach(System.out::println);
+        }
+    }
+    //****************************WITHDRAW*******************************************
+    private static void withdraw() {
+        System.out.print("Enter account number: ");
+        String accountNumber = scanner.nextLine();
+
+        BankAccount account = accounts.get(accountNumber);
+        if (account != null) {
+            System.out.print("Enter amount to withdraw: ");
+            double amount = scanner.nextDouble();
+            account.withdraw(amount);
+        } else {
+            System.out.println("Account not found.");
+        }
+    }
+    //****************************TRANSFER*******************************************
+    private static void transfer() {
+        System.out.print("Enter sender's account number: ");
+        String senderAccountNumber = scanner.nextLine();
+
+        BankAccount sender = accounts.get(senderAccountNumber);
+        if (sender != null) {
+            System.out.print("Enter recipient's account number: ");
+            String recipientAccountNumber = scanner.nextLine();
+
+            BankAccount recipient = accounts.get(recipientAccountNumber);
+            if (recipient != null) {
+                System.out.print("Enter amount to transfer: ");
+                double amount = scanner.nextDouble();
+                sender.transfer(recipient, amount);
+            } else {
+                System.out.println("Recipient account not found.");
+            }
+        } else {
+            System.out.println("Sender account not found.");
+        }
+    }
+    //****************************SAVE TO A FILE*******************************************
+    private static void saveReportToFile() {
+        String defaultFileName = "accounts_report.txt"; // Default file name
+        String filePath = System.getProperty("user.dir") + File.separator + defaultFileName; // Save in the current working directory
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (BankAccount account : accounts.values()) {
+                writer.write(account.toString());
+                writer.newLine();
+            }
+            System.out.println("Report saved successfully to " + filePath);
+        } catch (IOException e) {
+            System.out.println("Error saving report: " + e.getMessage());
+        }
+    }
 }
+

@@ -1,13 +1,34 @@
-public class BankAccount {
+import java.io.Serializable;
 
+public class BankAccount implements Serializable {
+
+    private String accountNumber;
+    private String accountHolderName;
     private double balance;
 
-    BankAccount(){
-        this.balance = 0;
+    public BankAccount(){}
+
+    public BankAccount(String accountNumber, String accountHolderName, double balance){
+        this.balance = balance;
+        this.accountHolderName = accountHolderName;
+        this.accountNumber = accountNumber;
+
     }
 
-    BankAccount(double balance){
-        this.balance = balance;
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
+    public String getAccountHolderName() {
+        return accountHolderName;
+    }
+
+    public void setAccountHolderName(String accountHolderName) {
+        this.accountHolderName = accountHolderName;
     }
 
     public void deposit(double amount){
@@ -38,12 +59,17 @@ public class BankAccount {
         if (amount > 0 && amount <= balance) {
             this.withdraw(amount);
             targetAccount.deposit(amount);
-            System.out.println("Transferred " + amount + " to target account.");
+            System.out.println("Transferred " + amount + " to " + targetAccount.getAccountHolderName());
         } else if (amount > balance) {
             System.out.println("Insufficient balance to transfer!");
         } else {
             System.out.println("Invalid transfer amount!");
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Account Number: " + accountNumber + ", Account Holder: " + accountHolderName + ", Balance: $" + balance;
     }
 
 }
