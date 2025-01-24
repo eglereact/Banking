@@ -9,7 +9,7 @@ public class BankAccount implements Serializable {
     public BankAccount(){}
 
     public BankAccount(String accountNumber, String accountHolderName, double balance){
-        this.balance = balance;
+        this.balance = Math.max(0, balance);
         this.accountHolderName = accountHolderName;
         this.accountNumber = accountNumber;
 
@@ -51,8 +51,8 @@ public class BankAccount implements Serializable {
         }
     }
 
-    public void printBalance() {
-        System.out.println("Current Balance: " + balance);
+    public double printBalance() {
+        return balance;
     }
 
     public void transfer(BankAccount targetAccount, double amount) {
